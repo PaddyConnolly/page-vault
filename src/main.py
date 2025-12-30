@@ -1,7 +1,5 @@
 from fastapi import FastAPI
+from db import lifespan
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 
-@app.get("/")
-def root():
-    return {"message": "Hello World!"}
