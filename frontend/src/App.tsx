@@ -14,10 +14,18 @@ import { useState, useEffect } from "react"
 export function JobListTable() {
   const [jobs, setJobs] = useState<Job[]>([])
 
-  useEffect(() => {
+  const fetchJobs = () => {
+
     fetch("http://127.0.0.1:8000/jobs")
       .then(response => response.json())
       .then(data => setJobs(data))
+  }
+
+
+  useEffect(() => {
+    fetchJobs()
+    const interval = setInterval(fetchJobs, 5000)
+    return () => clearInterval(interval)
   }, [])
 
   return (
