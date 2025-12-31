@@ -1,5 +1,15 @@
 from fastapi import FastAPI
-from db import lifespan
+from fastapi.middleware.cors import CORSMiddleware
+from src.db import lifespan
+from src.api import router
 
 app = FastAPI(lifespan=lifespan)
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.include_router(router)

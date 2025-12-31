@@ -1,11 +1,13 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from pathlib import Path
+from src.models import JobDisplay
 
 import sqlite3
 
 DBConnection = sqlite3.Connection 
-Page = sqlite3.Row 
+Page = sqlite3.Row
+
 
 def get_db():
     db_path = Path("~/.local/share/page-vault/page-vault.db").expanduser()
@@ -54,8 +56,31 @@ async def lifespan(_: FastAPI):
     yield
 
 
-def get_test_page(conn: DBConnection) -> Page | None:
+def get_pages(conn: DBConnection) -> list[Page] | None:
     cur = conn.cursor()
     cur.execute("SELECT * FROM page ORDER BY scraped_at DESC;")
-    page = cur.fetchone()
-    return page
+    pages = cur.fetchall()
+    return pages
+
+
+def get_jobs_for_display(conn: DBConnection) -> list[JobDisplay]:
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT job.id, job.title, company.name as company, job.location, job.url, job.status
+        FROM job JOIN company ON job.company_id = company.id;
+                """)
+    rows = cur.fetchall()
+    jobs = [JobDisplay(**dict(row)) for row in rows]
+    return jobs
+
+def get_company_name(conn: DBConnection, id: int) -> str:
+    cur = conn.cursor()
+    cur.execute("SELECT name FROM company WHERE id = ?", (id,))
+    row = cur.fetchone()
+    name = row["name"]
+    return name
+
+
+def delete_pages(conn: DBConnection):
+    cur = conn.cursor()
+    cur.execute("DELETE FROM page;")

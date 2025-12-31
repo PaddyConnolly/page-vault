@@ -8,15 +8,18 @@ import {
 } from "@/components/ui/table"
 import { StatusBadge } from "./components/StatusBadge"
 import type { Status } from "./components/StatusBadge"
+import { useState, useEffect } from "react"
+
 
 export function JobListTable() {
-  const jobs: { id: number; title: string; company: string; location: string; url: string; status: Status }[] = [
-    { id: 1, title: "Software Engineer", company: "Amazon", location: "Seattle, WA", status: "Logged", url: "https://amazon.jobs/123" },
-    { id: 2, title: "Frontend Dev", company: "Stripe", location: "San Francisco", status: "Applied", url: "https://stripe.com/jobs/456" },
-    { id: 3, title: "ML Engineer", company: "Anthropic", location: "London", status: "Interviewing", url: "https://anthropic.com/jobs/789" },
-    { id: 4, title: "DevOps Engineer", company: "Microsoft", location: "New York", status: "Rejected", url: "https://microsoft.com/jobs/910" },
-    { id: 5, title: "Sales Engineer", company: "Netflix", location: "Dublin", status: "Accepted", url: "https://netflix.com/jobs/234" },
-  ]
+  const [jobs, setJobs] = useState<Job[]>([])
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/jobs")
+      .then(response => response.json())
+      .then(data => setJobs(data))
+  }, [])
+
   return (
     <Table className="table">
       <TableHeader>
@@ -49,7 +52,7 @@ export function JobListTable() {
 
 function App() {
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto', padding: '3rem 1.5rem' }}>
+    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1.5rem' }}>
       <h1 style={{ fontSize: '1.75rem', marginBottom: '2rem', color: 'var(--primary)' }}>Page Vault</h1>
       <JobListTable />
     </div>

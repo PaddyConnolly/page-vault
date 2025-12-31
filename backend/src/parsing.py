@@ -1,5 +1,5 @@
-from db import get_db, get_test_page
-from dataclasses import dataclass
+from src.db import get_db, get_pages
+from src.models import ParsedJob
 from bs4 import BeautifulSoup, Comment
 import tldextract
 import sqlite3
@@ -8,16 +8,6 @@ import sqlite3
 DBConnection = sqlite3.Connection 
 Page = sqlite3.Row 
 
-@dataclass
-class Job:
-    page_id: int
-    company_id: int
-    title: str
-    location: str
-    url: str
-    descr: str
-    reqs: str
-    preferred_reqs: str
 
 def get_clean_soup(page: Page):
     soup = BeautifulSoup(page["html"], 'html.parser')
@@ -110,7 +100,7 @@ def trigger_company_creation(conn: DBConnection, name: str, selectors: list[str]
         raise Exception("Couldn't insert new company")
 
 
-def insert_job(conn: DBConnection, job: Job):
+def insert_job(conn: DBConnection, job: ParsedJob):
     cur = conn.cursor()
     cur.execute("""
     INSERT INTO job (page_id, company_id, title, location, url, descr, reqs, preferred_reqs)
@@ -132,10 +122,8 @@ def insert_parsed(conn: DBConnection, html: str) -> int:
     else:
         raise Exception("Couldn't insert new parse")
 
-def parse_page():
-    #page = get_page(get_db())
+def parse_page(page: Page):
     conn = get_db()
-    page = get_test_page(conn)
     if page:
         soup = get_clean_soup(page)
         url = get_page_url(page)
@@ -162,10 +150,21 @@ def parse_page():
     if (title is not None and
         location is not None):
         page_id = insert_parsed(conn, str(page["html"]))
-        job = Job(page_id=page_id, company_id=company_id, title=title, location=location, url=url, descr=descr, reqs=reqs, preferred_reqs=preferred_reqs)
+        job = ParsedJob(page_id=page_id, company_id=company_id, title=title, location=location, url=url, descr=descr, reqs=reqs, preferred_reqs=preferred_reqs)
         insert_job(conn, job)
     else:
         raise Exception("Bad Request")
 
 
     conn.close()
+
+def parse_pages():
+    pages = get_pages(get_db())
+    print(pages)
+    print("hello")
+    if pages:
+        for page in pages:
+            parse_page(page)
+    else:
+        raise Exception("Failed to get pages from database")
+
