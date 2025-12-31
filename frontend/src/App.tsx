@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/table"
 import { StatusBadge } from "./components/StatusBadge"
 import type { Status } from "./components/StatusBadge"
+import { StatusDial } from "./components/StatusDial"
 import { useState, useEffect } from "react"
 
 
@@ -16,18 +17,24 @@ export function JobListTable() {
 
   const fetchJobs = () => {
 
-    fetch("http://127.0.0.1:8000/jobs")
+    fetch("http://localhost:8000/jobs")
       .then(response => response.json())
       .then(data => setJobs(data))
   }
+  
+  const LIST_ORDER = ["Offer", "Interview", "Logged", "Applied", "Rejected"]
+
+  const sortedJobs = [...jobs].sort((a, b) => {
+    return LIST_ORDER.indexOf(a.status) - LIST_ORDER.indexOf(b.status)
+  })
 
   const deleteJob = (id: number) => {
-    fetch(`http://127.0.0.1:8000/jobs/${id}`, { method: "DELETE" })
+    fetch(`http://localhost:8000/jobs/${id}`, { method: "DELETE" })
       .then(() => fetchJobs())
   }
 
   const updateStatus = (id: number, status: string) => {
-  fetch(`http://127.0.0.1:8000/jobs/${id}?status=${status}`, { method: "PATCH" })
+  fetch(`http://localhost:8000/jobs/${id}?status=${status}`, { method: "PATCH" })
     .then(() => fetchJobs())
   }
 
@@ -38,6 +45,8 @@ export function JobListTable() {
   }, [])
 
   return (
+  <>
+    <StatusDial jobs={jobs} />
     <Table className="table">
       <TableHeader>
         <TableRow>
@@ -50,7 +59,7 @@ export function JobListTable() {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {jobs.map((job) => (
+        {sortedJobs.map((job) => (
           <TableRow key={job.id}>
             <TableCell>{job.title}</TableCell>
             <TableCell>{job.company}</TableCell>
@@ -85,13 +94,14 @@ export function JobListTable() {
         ))}
       </TableBody>
     </Table>
+  </>
   )
 }
 
 function App() {
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1.5rem' }}>
-      <h1 style={{ fontSize: '1.75rem', marginBottom: '2rem', color: 'var(--primary)' }}>Page Vault</h1>
+      <h1 style={{ fontSize: '1.75rem', marginBottom: '2rem', color: 'var(--primary)', fontWeight: '450', }}>Page Vault</h1>
       <JobListTable />
     </div>
   )
