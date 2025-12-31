@@ -158,10 +158,9 @@ def parse_page(page: Page):
 
     conn.close()
 
-def parse_pages():
-    pages = get_pages(get_db())
-    print(pages)
-    print("hello")
+def parse_pages(conn: DBConnection):
+
+    pages = get_pages(conn)
     if pages:
         for page in pages:
             parse_page(page)
