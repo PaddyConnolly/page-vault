@@ -2,6 +2,8 @@
 
 A job application tracker with browser-based page capture.
 
+<img src="frontend/src/assets/page-vault.png" alt="Screenshot" width="1000">
+
 ## Architecture
 
 - **Firefox Extension** - Capture job listings with configurable hotkey
