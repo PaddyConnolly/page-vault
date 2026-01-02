@@ -1,6 +1,6 @@
 from src.db import get_db, get_pages
 from src.models import ParsedJob
-from bs4 import BeautifulSoup, Comment
+from bs4 import BeautifulSoup
 import tldextract
 import sqlite3
 
@@ -13,8 +13,23 @@ def get_page_url(page: Page) -> str:
     return str(page["url"])
 
 def get_company_name_from_url(url: str) -> str:
-    name = tldextract.extract(url).domain.title()
-    return name
+    # Hacks for the annoying ones
+    extracted = tldextract.extract(url)
+    job_boards = ["myworkdayjobs", "eightfold"]
+    if extracted.domain in job_boards:
+        subdomain = extracted.subdomain.split('.')[0]
+        if subdomain == "aexp":
+            domain = "american express"
+            return domain.title()
+        if subdomain == "checkout":
+            domain = "Checkout.com"
+            return domain
+        return subdomain.title()
+    if extracted.domain == "datadoghq":
+        domain = "datadog"
+        return domain.title()
+    return extracted.domain.title()
+
 
 def get_company_id_from_url(conn: DBConnection, url: str) -> int | None:
     name = get_company_name_from_url(url) 
@@ -44,9 +59,11 @@ def get_job_title(soup: BeautifulSoup, selector: str) -> str | None:
 
 
 def get_job_location(soup: BeautifulSoup, selector: str) -> str | None:
+    if selector == "":
+        return ""
     location = soup.select_one(selector)
     if location:
-        return location.text
+        return normalize_location(location.text)
 
 
 def get_job_content(soup: BeautifulSoup, selector: str) -> str | None:
@@ -101,6 +118,20 @@ def get_selectors_from_db(conn: DBConnection, company_id: int) -> list[str]:
     row = cur.fetchone()
     return [row["header_selector"], row["location_selector"], row["content_selector"]]
 
+def normalize_location(location: str) -> str:
+    cities = [
+        "London", "Dublin", "San Jose", "Tokyo", "Stockholm", 
+        "Amsterdam", "Berlin", "Paris", "New York", "San Francisco",
+        "Singapore", "Sydney", "Toronto", "Remote"
+    ]
+    
+    location_upper = location.upper()
+    for city in cities:
+        if city.upper() in location_upper:
+            return city
+    
+    # Fallback: return original, cleaned up
+    return location.strip()
 
 def parse_page(page: Page):
     conn = get_db()

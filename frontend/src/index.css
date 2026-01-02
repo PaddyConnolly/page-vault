@@ -39,6 +39,14 @@
   border-bottom: 1px solid var(--border);
 }
 
+.table td:first-child,
+.table td:nth-child(3) {
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .table tr:hover {
   background-color: #EDE8E0;
 }
