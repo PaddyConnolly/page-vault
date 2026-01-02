@@ -14,7 +14,26 @@ import { useState, useEffect } from "react"
 
 export function JobListTable() {
   const [jobs, setJobs] = useState<Job[]>([])
+  const [search, setSearch] = useState("")
+  const [sortColumn, setSortColumn] = useState<string | null>(null)
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null)
 
+  const filteredJobs = jobs.filter(job => 
+    job.title.toLowerCase().includes(search.toLowerCase()) ||
+    job.company.toLowerCase().includes(search.toLowerCase())
+  )
+
+  const handleSort = (column: string) => {
+    if (sortColumn !== column) {
+      setSortColumn(column)
+      setSortDirection('asc')
+    } else if (sortDirection === 'asc') {
+      setSortDirection('desc')
+    } else {
+      setSortColumn(null)
+      setSortDirection(null)
+    }
+  }
   const fetchJobs = () => {
 
     fetch("http://localhost:8000/jobs")
@@ -24,8 +43,18 @@ export function JobListTable() {
   
   const LIST_ORDER = ["Offer", "Interview", "Logged", "Applied", "Rejected"]
 
-  const sortedJobs = [...jobs].sort((a, b) => {
-    return LIST_ORDER.indexOf(a.status) - LIST_ORDER.indexOf(b.status)
+  const sortedJobs = [...filteredJobs].sort((a, b) => {
+    // Default sort by status if no column selected
+    if (!sortColumn || !sortDirection) {
+      return LIST_ORDER.indexOf(a.status) - LIST_ORDER.indexOf(b.status)
+    }
+    
+    const aVal = a[sortColumn as keyof Job]
+    const bVal = b[sortColumn as keyof Job]
+    
+    if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1
+    if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1
+    return 0
   })
 
   const deleteJob = (id: number) => {
@@ -47,13 +76,42 @@ export function JobListTable() {
   return (
   <>
     <StatusDial jobs={jobs} />
+    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '-1rem' }}>
+      <input
+        type="text"
+        className="search-input"
+        placeholder="Search jobs..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+    </div>
     <Table className="table">
       <TableHeader>
         <TableRow>
-          <TableHead>Title</TableHead>
-          <TableHead>Company</TableHead>
-          <TableHead>Location</TableHead>
-          <TableHead>Status</TableHead>
+            <TableHead 
+              onClick={() => handleSort('title')} 
+              style={{ cursor: 'pointer' }}
+            >
+              Title {sortColumn === 'title' && (sortDirection === 'asc' ? '↑' : '↓')}
+            </TableHead>
+            <TableHead 
+              onClick={() => handleSort('company')} 
+              style={{ cursor: 'pointer' }}
+            >
+              Company {sortColumn === 'company' && (sortDirection === 'asc' ? '↑' : '↓')}
+            </TableHead>
+            <TableHead 
+              onClick={() => handleSort('location')} 
+              style={{ cursor: 'pointer' }}
+            >
+              Location {sortColumn === 'location' && (sortDirection === 'asc' ? '↑' : '↓')}
+            </TableHead>
+            <TableHead 
+              onClick={() => handleSort('status')} 
+              style={{ cursor: 'pointer' }}
+            >
+              Status {sortColumn === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
+            </TableHead>
           <TableHead></TableHead>
           <TableHead></TableHead>
         </TableRow>

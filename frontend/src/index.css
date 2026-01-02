@@ -142,3 +142,24 @@ table a.link-button {
   font-family: system-ui, sans-serif;
   margin-top: -3.5rem;
 }
+
+.search-input {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--background);
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: 0.9rem;
+  width: 250px;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.search-input::placeholder {
+  color: var(--primary);
+  opacity: 0.6;
+}

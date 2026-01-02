@@ -9,36 +9,6 @@ DBConnection = sqlite3.Connection
 Page = sqlite3.Row 
 
 
-def get_clean_soup(page: Page):
-    soup = BeautifulSoup(page["html"], 'html.parser')
-
-    head = soup.find("head")
-    if head:
-        head.decompose()
-
-    first_header = soup.find("header")
-    if first_header:
-        first_header.decompose()
-
-    non_content_tags = ["script", "style", "iframe", "footer", "nav", "noscript", "link", "meta", "path", "svg", "br", "img", "option", "button", "select", "input", "form", "pre"]
-
-    for tag_name in non_content_tags:
-        for tag in soup.find_all(tag_name):
-            tag.decompose()
-
-    for comment in soup.find_all(string=lambda text: isinstance(text, Comment)):
-        comment.extract()
-
-    footer = soup.find("footer")
-    if footer:
-        footer.decompose()
-
-    footer = soup.select(".footer")
-    for tag in footer:
-        tag.decompose()
-
-    return soup
-
 def get_page_url(page: Page) -> str:
     return str(page["url"])
 
@@ -67,20 +37,20 @@ def get_company_id_from_name(conn: DBConnection, name: str) -> int | None:
     else:
         return None
 
-def get_job_title(soup: BeautifulSoup) -> str | None:
-    title = soup.select_one(".title")
+def get_job_title(soup: BeautifulSoup, selector: str) -> str | None:
+    title = soup.select_one(selector)
     if title:
         return title.text
 
 
-def get_job_location(soup: BeautifulSoup) -> str | None:
-    location = soup.select_one("ul.association-content li")
+def get_job_location(soup: BeautifulSoup, selector: str) -> str | None:
+    location = soup.select_one(selector)
     if location:
         return location.text
 
 
-def get_job_content(soup: BeautifulSoup) -> str | None:
-    content = soup.select_one("div.container > div > div > div.content")
+def get_job_content(soup: BeautifulSoup, selector: str) -> str | None:
+    content = soup.select_one(selector)
     if content:
         return content.text
 
@@ -122,30 +92,53 @@ def insert_parsed(conn: DBConnection, html: str) -> int:
     else:
         raise Exception("Couldn't insert new parse")
 
+def get_selectors_from_html(html: Page) -> list[str]:
+    return ["ul.association-content li",".title","div.container > div > div > div.content"] 
+
+def get_selectors_from_db(conn: DBConnection, company_id: int) -> list[str]:
+    cur = conn.cursor()
+    cur.execute("SELECT header_selector, location_selector, content_selector FROM company WHERE id = ?", (company_id,))
+    row = cur.fetchone()
+    return [row["header_selector"], row["location_selector"], row["content_selector"]]
+
+
 def parse_page(page: Page):
     conn = get_db()
     if page:
-        soup = get_clean_soup(page)
+        soup = BeautifulSoup(page["html"], 'html.parser')
         url = get_page_url(page)
 
     else:
         raise Exception("Failed to get Page")
 
-    title = get_job_title(soup)
-    company_id = get_company_id_from_url(conn, url)
-    location = get_job_location(soup)
-    content = get_job_content(soup)
-    if content:
-        (descr, reqs, preferred_reqs) = parse_content(content)
 
-    else:
-        raise Exception("Bad request 1")
- 
+    company_id = get_company_id_from_url(conn, url)
 
     if company_id is None:
         name = get_company_name_from_url(url)
-        selectors = ["ul.association-content li",".title","div.container > div > div > div.content"]
+        selectors = get_selectors_from_html(page)
         company_id = trigger_company_creation(conn, name, selectors)
+        title = get_job_title(soup, selectors[0])
+        location = get_job_location(soup, selectors[1])
+        content = get_job_content(soup, selectors[2])
+        if content:
+            (descr, reqs, preferred_reqs) = parse_content(content)
+
+        else:
+            raise Exception("Bad request 1")
+    
+
+    else:
+        title_selector, location_selector, content_selector = get_selectors_from_db(conn, company_id)
+        title = get_job_title(soup, title_selector)
+        location = get_job_location(soup, location_selector)
+        content = get_job_content(soup, content_selector)
+        if content:
+            (descr, reqs, preferred_reqs) = parse_content(content)
+
+        else:
+            raise Exception("Bad request 2")
+    
 
     if (title is not None and
         location is not None):
