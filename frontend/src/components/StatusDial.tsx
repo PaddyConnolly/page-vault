@@ -1,3 +1,5 @@
+import type { Job } from "../types.ts"
+
 interface StatusDialProps {
   jobs: Job[]
 }
@@ -42,7 +44,7 @@ export function StatusDial({ jobs }: StatusDialProps) {
 
   let currentAngle = startOffset
 
-  const arcs = segments.map((segment, i) => {
+  const arcs = segments.map((segment, _) => {
     const angle = segment.percentage * totalArcAngle
     const startAngle = currentAngle
     const endAngle = currentAngle + angle

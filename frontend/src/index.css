@@ -22,6 +22,7 @@
   margin-top: 2rem;
   width: 100%;
   border-collapse: collapse;
+  border: 0px;
   table-layout: auto;
 }
 
@@ -170,4 +171,85 @@ table a.link-button {
 .search-input::placeholder {
   color: var(--primary);
   opacity: 0.6;
+}
+
+.navbar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-title {
+  font-size: 1.75rem;
+  color: var(--primary);
+  font-weight: 500;
+  margin: 0;
+}
+
+.nav-links {
+  display: flex;
+  font-size: 1.25rem;
+  gap: 3rem;
+  font-weight: 550;
+}
+
+.nav-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-family: system-ui, sans-serif;
+}
+
+.nav-link:hover {
+  color: var(--foreground);
+}
+
+.companies-page {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.category-title {
+  font-size: 1.25rem;
+  color: var(--primary);
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.company-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}
+
+.company-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: background-color 0.15s ease;
+}
+
+.company-card:hover {
+  background-color: #EDE8E0;
+}
+
+.company-logo {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  object-fit: contain;
+}
+
+.company-name {
+  font-size: 0.8rem;
+  color: var(--foreground);
+  text-align: center;
+  font-family: system-ui, sans-serif;
 }
