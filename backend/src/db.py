@@ -40,6 +40,7 @@ async def lifespan(_: FastAPI):
     cur.execute("""
                 CREATE TABLE IF NOT EXISTS company (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
+                url TEXT NOT NULL UNIQUE,
                 name TEXT NOT NULL UNIQUE,
                 location_selector TEXT,
                 header_selector TEXT,

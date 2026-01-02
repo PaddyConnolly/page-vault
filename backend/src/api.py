@@ -33,3 +33,13 @@ def update_job_status(job_id: int, status: str, conn: DBConnection = Depends(get
     if cur.rowcount == 0:
         raise HTTPException(status_code=404, detail="Job not found")
     return {"updated": job_id, "status": status}
+
+@router.post("/jobs/companies/{company_id}")
+def get_careers_url_for_company(company_id: int, conn: DBConnection = Depends(get_db_dep)):
+    cur = conn.cursor()
+    cur.execute("SELECT url FROM company WHERE id = ?", (company_id,))
+    if cur.rowcount == 0:
+        raise HTTPException(status_code=404, detail="Company not found")
+    else:
+        url = row["url"]
+    return url
