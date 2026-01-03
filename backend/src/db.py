@@ -55,6 +55,7 @@ async def lifespan(_: FastAPI):
                 header_selector TEXT,
                 content_selector TEXT NOT NULL)
                 """)
+    rows = cur.rowcount
 
     cur.execute("""
                 CREATE TABLE IF NOT EXISTS job (
