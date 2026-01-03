@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Python/React
 .venv
 __pycache__/
@@ -14,6 +15,8 @@ tmp*
 *.db
 
 # TypeScript
+=======
+>>>>>>> extension/main
 node_modules/
 dist/
 *.log
