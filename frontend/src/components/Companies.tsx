@@ -1,36 +1,52 @@
 import { mapCompanyLogo } from './JobListTable.tsx'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
-const CATEGORIES = {
-  "Big Tech": ["Google", "Amazon", "Microsoft", "Meta", "Apple", "Oracle", "Netflix", "Nvidia", "X"],
-  "Fintech": ["Stripe", "Revolut", "Adyen", "Checkout.com", "Wise", "PayPal", "Square", "Block", "Plaid", "Airwallex", "Visa", "Mastercard", "American Express", "GoCardless", "TrueLayer", "Modulr", "Form3", "Primer", "Marqeta"],
-  "Infrastructure": ["Datadog", "Snowflake", "Databricks", "Cloudflare", "MongoDB", "Twilio", "HashiCorp"],
-  "Payment Infrastructure": ["GoCardless", "TrueLayer", "Modulr", "Form3", "Primer", "Marqeta"],
-  "Finance & Banking": ["JPMorgan", "Goldman Sachs", "Morgan Stanley", "Bloomberg", "LSEG", "Bank of America", "Citi", "HSBC", "Barclays", "Monzo", "Starling"],
-  "Quant & AI": ["Citadel", "Two Sigma", "Jane Street", "DE Shaw", "Point72", "Millennium", "HRT", "OpenAI", "Anthropic", "xAI", "Brevan Howard", "Marshall Wace"],
-  "Crypto & Prediction": ["Coinbase", "Kraken", "Binance", "Polymarket", "Kalshi"],
-  "Consumer Tech": ["Uber", "Deliveroo", "Spotify", "Discord", "Notion", "Slack", "Shopify", "Airbnb"],
-}
-
+type Categories = Record<string, string[]>
 
 export function Companies() {
   const [search, setSearch] = useState("")
+  const [categories, setCategories] = useState<Categories>({})
+  useEffect(() => {
+    fetch("http://localhost:8000/companies/categories")
+      .then(r => r.json())
+      .then((data: Array<{ name: string, type: string }>) => {
+        const grouped: Categories = {}
+        data.forEach(({ name, type }) => {
+          if (!grouped[type]) {
+            grouped[type] = []
+          }
+          grouped[type].push(name)
+        })
+        setCategories(grouped)
+      })
+      .catch(e => console.error("Failed to fetch categories:", e))
+  }, [])
 
   const openCareersPage = async (company: string) => {
     try {
       const response = await fetch(`http://localhost:8000/companies/${encodeURIComponent(company)}/careers`)
       const data = await response.json()
+      console.log(data)
       if (data.url) {
         window.open(data.url, '_blank')
       }
-    } catch (error) {
-      console.error('Failed to fetch careers URL:', error)
+    } catch (e) {
+      console.error(e)
     }
   }
 
-  const filteredCategories = Object.entries(CATEGORIES).map(([category, companies]) => {
+
+  const filteredCategories = Object.entries(categories).map(([category, companies]) => {
+    const searchLower = search.toLowerCase()
+
+    // If category matches, show all companies in it
+    if (category.toLowerCase().includes(searchLower)) {
+      return [category, companies] as [string, string[]]
+    }
+
+    // Otherwise filter companies
     const filtered = companies.filter(company =>
-      company.toLowerCase().includes(search.toLowerCase())
+      company.toLowerCase().includes(searchLower)
     )
     return [category, filtered] as [string, string[]]
   }).filter(([_, companies]) => companies.length > 0)

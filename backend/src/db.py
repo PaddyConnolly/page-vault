@@ -31,6 +31,14 @@ async def lifespan(_: FastAPI):
     cur = conn.cursor()
 
     cur.execute("""
+                CREATE TABLE IF NOT EXISTS user (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT NOT NULL UNIQUE,
+                password_hash TEXT NOT NULL,
+                created TEXT DEFAULT CURRENT_TIMESTAMP)
+                """)
+
+    cur.execute("""
                 CREATE TABLE IF NOT EXISTS parsed (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 html TEXT NOT NULL,
@@ -41,6 +49,7 @@ async def lifespan(_: FastAPI):
                 CREATE TABLE IF NOT EXISTS company (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 url TEXT NOT NULL UNIQUE,
+                type TEXT NOT NULL UNIQUE,
                 name TEXT NOT NULL UNIQUE,
                 location_selector TEXT,
                 header_selector TEXT,

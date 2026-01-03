@@ -34,12 +34,24 @@ def update_job_status(job_id: int, status: str, conn: DBConnection = Depends(get
         raise HTTPException(status_code=404, detail="Job not found")
     return {"updated": job_id, "status": status}
 
-@router.post("/jobs/companies/{company_id}")
-def get_careers_url_for_company(company_id: int, conn: DBConnection = Depends(get_db_dep)):
+@router.get("/companies/{name}/careers")
+def get_careers_url_for_company(name: str, conn: DBConnection = Depends(get_db_dep)):
     cur = conn.cursor()
-    cur.execute("SELECT url FROM company WHERE id = ?", (company_id,))
-    if cur.rowcount == 0:
+    cur.execute("SELECT url FROM company WHERE name = ?", (name,))
+    row = cur.fetchone()
+    if not row["url"]:
         raise HTTPException(status_code=404, detail="Company not found")
     else:
-        url = row["url"]
-    return url
+        url: str = row["url"]
+    return {"url": url}
+
+
+@router.get("/companies/categories")
+def get_company_categories(conn: DBConnection = Depends(get_db_dep)):
+    cur = conn.cursor()
+    cur.execute("SELECT name, type FROM company;")
+    rows = cur.fetchall()
+    if not rows:
+        raise HTTPException(status_code=404, detail="No categories found")
+    else:
+        return rows
