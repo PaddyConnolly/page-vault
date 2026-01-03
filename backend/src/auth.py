@@ -12,7 +12,7 @@ class AuthRequest(BaseModel):
     password: str
 
 
-router = APIRouter()
+auth_router = APIRouter()
 
 def create_token(user_id: int) -> str:
     now = datetime.now(timezone.utc)
@@ -28,7 +28,7 @@ def create_token(user_id: int) -> str:
     return token
 
 
-@router.post("/register")
+@auth_router.post("/register")
 def register_user(req: AuthRequest, conn: DBConnection = Depends(get_db_dep)):
     hash = bcrypt.hashpw(req.password.encode("utf-8"), bcrypt.gensalt(rounds=12))
     cur = conn.cursor()
@@ -40,7 +40,7 @@ def register_user(req: AuthRequest, conn: DBConnection = Depends(get_db_dep)):
         raise HTTPException(status_code=400, detail="Email already exists")
 
 
-@router.post("/login")
+@auth_router.post("/login")
 def login_user(req: AuthRequest, conn: DBConnection = Depends(get_db_dep)):
     cur = conn.cursor()
     cur.execute("SELECT id, password_hash FROM user WHERE email = ? ", (req.email,))

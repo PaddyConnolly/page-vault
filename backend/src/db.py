@@ -11,6 +11,8 @@ Page = sqlite3.Row
 
 def get_db():
     db_path = Path("~/.local/share/page-vault/page-vault.db").expanduser()
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+
     conn = sqlite3.connect(db_path, check_same_thread=False)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON;")
@@ -49,13 +51,12 @@ async def lifespan(_: FastAPI):
                 CREATE TABLE IF NOT EXISTS company (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 url TEXT NOT NULL UNIQUE,
-                type TEXT NOT NULL UNIQUE,
+                type TEXT NOT NULL,
                 name TEXT NOT NULL UNIQUE,
                 location_selector TEXT,
                 header_selector TEXT,
-                content_selector TEXT NOT NULL)
+                content_selector TEXT)
                 """)
-    rows = cur.rowcount
 
     cur.execute("""
                 CREATE TABLE IF NOT EXISTS job (
@@ -71,6 +72,8 @@ async def lifespan(_: FastAPI):
                 preferred_reqs TEXT,
                 created TEXT DEFAULT CURRENT_TIMESTAMP)
                 """)
+
+
     conn.commit()
     conn.close()
     yield

@@ -253,3 +253,73 @@ table a.link-button {
   text-align: center;
   font-family: system-ui, sans-serif;
 }
+
+.auth-container {
+  max-width: 400px;
+  margin: 4rem auto;
+  padding: 2rem;
+}
+
+.auth-title {
+  text-align: center;
+  color: var(--primary);
+  margin-bottom: 2rem;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.auth-input {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--background);
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.auth-button {
+  padding: 0.75rem 1rem;
+  background: var(--primary);
+  color: var(--background);
+  border: none;
+  border-radius: var(--radius);
+  font-family: system-ui, sans-serif;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.auth-button:hover {
+  opacity: 0.9;
+}
+
+.auth-error {
+  color: #8B5555;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 1rem;
+  font-family: system-ui, sans-serif;
+  color: var(--foreground);
+}
+
+.auth-link {
+  color: var(--primary);
+  cursor: pointer;
+}
+
+.auth-link:hover {
+  text-decoration: underline;
+}
