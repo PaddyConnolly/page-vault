@@ -6,6 +6,7 @@ from pydantic import BaseModel
 import jwt
 import bcrypt
 import os
+from dotenv import load_dotenv
 
 class AuthRequest(BaseModel):
     email: str
@@ -13,6 +14,7 @@ class AuthRequest(BaseModel):
 
 
 auth_router = APIRouter()
+load_dotenv()
 
 def create_token(user_id: int) -> str:
     now = datetime.now(timezone.utc)
@@ -23,7 +25,7 @@ def create_token(user_id: int) -> str:
         "iat": now,
         "exp": now + timedelta(hours=1)
     }
-    secret = os.environ["JWT_SECRET"]
+    secret = os.environ.get("JWT_SECRET", "dev-fallback-secret")
     token: str =  jwt.encode(payload, secret, algorithm="HS256") # pyright: ignore[reportUnknownMemberType]
     return token
 

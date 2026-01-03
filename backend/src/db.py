@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from pathlib import Path
 from src.models import JobDisplay
+from appdirs import user_data_dir
 
 import sqlite3
 
@@ -10,7 +11,8 @@ Page = sqlite3.Row
 
 
 def get_db():
-    db_path = Path("~/.local/share/page-vault/page-vault.db").expanduser()
+    udd_path = Path(user_data_dir("page-vault", "page-vault"))
+    db_path = udd_path / Path("page-vault.db")
     db_path.parent.mkdir(parents=True, exist_ok=True)
 
     conn = sqlite3.connect(db_path, check_same_thread=False)
