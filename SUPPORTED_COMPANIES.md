@@ -1,17 +1,41 @@
 ## Supported Companies
 
-Selectors configured for:
+Selectors configured for
 - Adyen
+- Airwallex
 - Amazon
 - American Express
+- Apple
+- Block
+- Bloomberg
 - Checkout.com
+- Citadel
+- Cloudflare
+- Coinbase
+- Databricks
 - Datadog
+- Deliveroo
+- Form3
+- Goldman Sachs
 - Google
+- JPMorgan
+- Kalshi
+- Marqeta
 - Mastercard
+- Meta
+- Microsoft
+- Monzo
+- Morgan Stanley
+- Oracle
 - Paypal
+- Plaid
 - Revolut
 - Snowflake
+- Spotify
+- Starling
 - Stripe
+- TrueLayer
+- Twilio
+- Uber
 - Visa
 - Wise
-

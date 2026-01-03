@@ -17,7 +17,7 @@ Company detection and location parsing are currently hardcoded:
 - Company names are extracted from URL domains (with special handling for job boards like workday)
 - Locations are normalized by matching against a list of known cities
 
-See [SUPPORTED_COMPANIES.md](SUPPORTED_COMPANIES.md) for the full list of configured companies.
+See [SUPPORTED_COMPANIES.md](SUPPORTED_COMPANIES.md) for the full list of configured companies (over 35+ tech companies currently configured).
 
 ## Status
 
