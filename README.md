@@ -6,10 +6,8 @@ A job application tracker with browser-based page capture.
 
 ## Architecture
 
-- **[Firefox Extension](https://github.com/PaddyConnolly/page-vault-extension)** - Capture job listings with configurable hotkey
-- **[Rust Server](https://github.com/PaddyConnolly/page-vault-server)** - Stores raw HTML in SQLite
-- **Python/FastAPI** - Parses HTML, exposes REST API
-- **React Frontend** - Displays and manages saved jobs
+- 🦊 Firefox extension for capturing and archiving webpage HTML via hotkey
+- 🦀 Single-threaded HTTP server built using only Rust's standard library for archiving webpage HTML 
 
 ## Notes
 
