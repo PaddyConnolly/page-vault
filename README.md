@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 💼 Page Vault
 
 A job application tracker with browser-based page capture.
