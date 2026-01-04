@@ -16,4 +16,3 @@ extension/node_modules/
 extension/dist/
 *.log
 .DS_STORE
-extension/web-ext-artifacts/

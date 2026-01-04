@@ -16,7 +16,9 @@ A job application tracker with browser-based page capture.
 
 ## Usage
 
-Access site at http://localhost:5173 after
+Download [extension](extension/page-vault.xpi) and go to Firefox -> Extensions -> Manage Extension -> Install Add-on from file
+
+Access site at http://localhost:5173 after:
 
 ```
 make all
