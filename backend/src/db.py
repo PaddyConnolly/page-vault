@@ -68,7 +68,7 @@ async def lifespan(_: FastAPI):
                 user_id INTEGER NOT NULL REFERENCES user(id),
                 title TEXT NOT NULL,
                 location TEXT NOT NULL,
-                url TEXT NOT NULL UNIQUE,
+                url TEXT NOT NULL,
                 status TEXT DEFAULT "Logged",
                 descr TEXT,
                 reqs TEXT,

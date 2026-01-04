@@ -6,6 +6,12 @@ import { useState } from 'react'
 
 function App() {
   const [token, setToken] = useState<string | null>(localStorage.getItem("token"))
+
+  const logout = () => {
+    localStorage.removeItem("token")
+    setToken(null)
+  }
+
   if (!token) {
     return <Auth onLogin={setToken} />
   }
@@ -16,6 +22,7 @@ function App() {
         <div className="nav-links">
           <Link to="/" className="nav-link">Jobs</Link>
           <Link to="/companies" className="nav-link">Companies</Link>
+          <button onClick={logout} className="logout-button">Logout</button>
         </div>
       </nav>
       <Routes>

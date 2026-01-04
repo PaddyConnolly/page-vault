@@ -1,26 +1,32 @@
 from fastapi import APIRouter, Depends, HTTPException
 from src.db import get_db_dep, get_jobs_for_display, delete_pages, JobDisplay, DBConnection
 from src.parsing import parse_pages
-import os
-import jwt
+from src.auth import get_current_user
 
 
 router = APIRouter()
 
+
+@router.get("/jobs")
 def get_jobs(
     conn: DBConnection = Depends(get_db_dep),
-    user_id: int = -1) -> list[JobDisplay]:
+    user_id: int = Depends(get_current_user)
+) -> list[JobDisplay]:
+    parse_pages(conn, user_id)
+    delete_pages(conn)
+
     return get_jobs_for_display(conn, user_id)
 
 @router.post("/parse")
-def parse(conn: DBConnection = Depends(get_db_dep)):
-    parse_pages(conn)
+def parse(conn: DBConnection = Depends(get_db_dep), user_id: int = Depends(get_current_user)):
+    parse_pages(conn, user_id)
     delete_pages(conn)
 
 @router.delete("/jobs/{job_id}")
-def delete_job(job_id: int, conn: DBConnection = Depends(get_db_dep)):
+def delete_job(job_id: int, conn: DBConnection = Depends(get_db_dep), user_id: int = Depends(get_current_user)):
     cur = conn.cursor()
-    cur.execute("DELETE FROM job WHERE id = ?", (job_id,))
+    print(user_id)
+    cur.execute("DELETE FROM job WHERE id = ? AND user_id = ?", (job_id,user_id))
     conn.commit()
     if cur.rowcount == 0:
         raise HTTPException(status_code=404, detail="Job not found")
@@ -28,9 +34,9 @@ def delete_job(job_id: int, conn: DBConnection = Depends(get_db_dep)):
 
 
 @router.patch("/jobs/{job_id}")
-def update_job_status(job_id: int, status: str, conn: DBConnection = Depends(get_db_dep)):
+def update_job_status(job_id: int, status: str, conn: DBConnection = Depends(get_db_dep), user_id: int = Depends(get_current_user)):
     cur = conn.cursor()
-    cur.execute("UPDATE job SET status = ? WHERE id = ?", (status, job_id))
+    cur.execute("UPDATE job SET status = ? WHERE id = ? AND user_id = ?", (status, job_id, user_id))
     conn.commit()
     if cur.rowcount == 0:
         raise HTTPException(status_code=404, detail="Job not found")
@@ -58,8 +64,3 @@ def get_company_categories(conn: DBConnection = Depends(get_db_dep)):
     else:
         return rows
 
-def get_current_user(authorization: str) -> int:
-    token = authorization.replace("Bearer ", "")
-    key = os.environ.get("JWT_SECRET", "")
-    payload = jwt.decode(token, key, algorithms=["HS256"], audience="page-vault-api")
-    return int(payload["sub"])

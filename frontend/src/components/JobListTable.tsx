@@ -67,12 +67,15 @@ export function JobListTable() {
     }
   }
   const fetchJobs = () => {
-
-    fetch("http://localhost:8000/jobs")
+    const token = localStorage.getItem("token")
+    fetch("http://localhost:8000/jobs", {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    })
       .then(response => response.json())
       .then(data => setJobs(data))
   }
-
   const LIST_ORDER = ["Offer", "Interview", "Logged", "Applied", "Rejected"]
 
   const sortedJobs = [...filteredJobs].sort((a, b) => {
@@ -90,12 +93,14 @@ export function JobListTable() {
   })
 
   const deleteJob = (id: number) => {
-    fetch(`http://localhost:8000/jobs/${id}`, { method: "DELETE" })
+    const token = localStorage.getItem("token")
+    fetch(`http://localhost:8000/jobs/${id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } })
       .then(() => fetchJobs())
   }
 
   const updateStatus = (id: number, status: string) => {
-    fetch(`http://localhost:8000/jobs/${id}?status=${status}`, { method: "PATCH" })
+    const token = localStorage.getItem("token")
+    fetch(`http://localhost:8000/jobs/${id}?status=${status}`, { method: "PATCH", headers: { "Authorization": `Bearer ${token}` } })
       .then(() => fetchJobs())
   }
 

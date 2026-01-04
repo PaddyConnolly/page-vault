@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 from src.db import DBConnection, get_db_dep
 import sqlite3
 from datetime import datetime, timedelta, timezone
@@ -23,13 +23,18 @@ def create_token(user_id: int) -> bytes:
         "iss": "page-vault",
         "aud": "page-vault-api",
         "iat": now,
-        "exp": now + timedelta(hours=1)
+        "exp": now + timedelta(days=7)
     }
     secret = os.environ.get("JWT_SECRET", "dev-fallback-secret")
     token =  jwt.encode(payload, secret, algorithm="HS256")
     return token
 
 
+def get_current_user(authorization: str = Header(..., alias="Authorization")) -> int:
+    token = authorization.replace("Bearer ", "")
+    key = os.environ.get("JWT_SECRET", "")
+    payload = jwt.decode(token, key, algorithms=["HS256"], audience="page-vault-api")
+    return int(payload["sub"])
 
 @auth_router.post("/register")
 def register_user(req: AuthRequest, conn: DBConnection = Depends(get_db_dep)):

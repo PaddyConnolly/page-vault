@@ -323,3 +323,18 @@ table a.link-button {
 .auth-link:hover {
   text-decoration: underline;
 }
+
+
+.logout-button {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-family: system-ui, sans-serif;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0;
+}
+
+.logout-button:hover {
+  color: var(--foreground);
+}

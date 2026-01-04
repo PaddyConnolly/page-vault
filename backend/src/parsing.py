@@ -87,13 +87,13 @@ def trigger_company_creation(conn: DBConnection, name: str, selectors: list[str]
         raise Exception("Couldn't insert new company")
 
 
-def insert_job(conn: DBConnection, job: ParsedJob):
+def insert_job(conn: DBConnection, job: ParsedJob, user_id: int):
     cur = conn.cursor()
     cur.execute("""
-    INSERT INTO job (page_id, company_id, title, location, url, descr, reqs, preferred_reqs)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+    INSERT INTO job (page_id, company_id, user_id, title, location, url, descr, reqs, preferred_reqs)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
     """,
-    (job.page_id, job.company_id, job.title, job.location, job.url, job.descr, job.reqs, job.preferred_reqs))
+    (job.page_id, job.company_id, user_id, job.title, job.location, job.url, job.descr, job.reqs, job.preferred_reqs))
     conn.commit()
     if cur.lastrowid:
         return cur.lastrowid
@@ -133,7 +133,7 @@ def normalize_location(location: str) -> str:
     # Fallback: return original, cleaned up
     return location.strip()
 
-def parse_page(page: Page):
+def parse_page(page: Page, user_id: int):
     conn = get_db()
     if page:
         soup = BeautifulSoup(page["html"], 'html.parser')
@@ -175,19 +175,18 @@ def parse_page(page: Page):
         location is not None):
         page_id = insert_parsed(conn, str(page["html"]))
         job = ParsedJob(page_id=page_id, company_id=company_id, title=title, location=location, url=url, descr=descr, reqs=reqs, preferred_reqs=preferred_reqs)
-        insert_job(conn, job)
+        insert_job(conn, job, user_id)
     else:
         raise Exception("Bad Request")
 
 
     conn.close()
 
-def parse_pages(conn: DBConnection):
+def parse_pages(conn: DBConnection, user_id: int):
 
     pages = get_pages(conn)
     if pages:
         for page in pages:
-            parse_page(page)
+            parse_page(page, user_id)
     else:
-        raise Exception("Failed to get pages from database")
-
+        pass
