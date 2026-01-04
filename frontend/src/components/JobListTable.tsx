@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -6,114 +6,94 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { StatusDial } from "./StatusDial"
-import type { Job } from "../types.ts"
-
-export const mapCompanyLogo = (name: string) => {
-  var logo = ""
-  switch (name) {
-    case "Datadog":
-      logo = "datadoghq"
-      break;
-    case "Checkout.com":
-      logo = "checkout"
-      break;
-    case "Starling":
-      logo = "starlingbank"
-      break;
-    case "Modulr":
-      logo = "modulrfinance"
-      break;
-    case "Millennium":
-      logo = "mlp"
-      break;
-    case "HRT":
-      logo = "hudsonrivertrading"
-      break;
-    case "Marshall Wace":
-      logo = "mwam"
-      break;
-    case "Bank of America":
-      logo = "bofa"
-      break;
-    default:
-      logo = name.replace(/\s/g, "")
-  }
-  return logo.toLowerCase()
-}
-
+} from "@/components/ui/table";
+import { StatusDial } from "./StatusDial";
+import type { Job } from "../types.ts";
+import { mapCompanyLogo } from "../companyLogos.ts";
 
 export function JobListTable() {
-  const [jobs, setJobs] = useState<Job[]>([])
-  const [search, setSearch] = useState("")
-  const [sortColumn, setSortColumn] = useState<string | null>(null)
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null)
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [search, setSearch] = useState("");
+  const [sortColumn, setSortColumn] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc" | null>(
+    null,
+  );
 
-  const filteredJobs = jobs.filter(job =>
-    job.title.toLowerCase().includes(search.toLowerCase()) ||
-    job.company.toLowerCase().includes(search.toLowerCase())
-  )
+  const filteredJobs = jobs.filter(
+    (job) =>
+      job.title.toLowerCase().includes(search.toLowerCase()) ||
+      job.company.toLowerCase().includes(search.toLowerCase()),
+  );
 
   const handleSort = (column: string) => {
     if (sortColumn !== column) {
-      setSortColumn(column)
-      setSortDirection('asc')
-    } else if (sortDirection === 'asc') {
-      setSortDirection('desc')
+      setSortColumn(column);
+      setSortDirection("asc");
+    } else if (sortDirection === "asc") {
+      setSortDirection("desc");
     } else {
-      setSortColumn(null)
-      setSortDirection(null)
+      setSortColumn(null);
+      setSortDirection(null);
     }
-  }
+  };
   const fetchJobs = () => {
-    const token = localStorage.getItem("token")
+    const token = localStorage.getItem("token");
     fetch("http://localhost:8000/jobs", {
       headers: {
-        "Authorization": `Bearer ${token}`
-      }
+        Authorization: `Bearer ${token}`,
+      },
     })
-      .then(response => response.json())
-      .then(data => setJobs(data))
-  }
-  const LIST_ORDER = ["Offer", "Interview", "Logged", "Applied", "Rejected"]
+      .then((response) => response.json())
+      .then((data) => setJobs(data));
+  };
+  const LIST_ORDER = ["Offer", "Interview", "Logged", "Applied", "Rejected"];
 
   const sortedJobs = [...filteredJobs].sort((a, b) => {
     // Default sort by status if no column selected
     if (!sortColumn || !sortDirection) {
-      return LIST_ORDER.indexOf(a.status) - LIST_ORDER.indexOf(b.status)
+      return LIST_ORDER.indexOf(a.status) - LIST_ORDER.indexOf(b.status);
     }
 
-    const aVal = a[sortColumn as keyof Job]
-    const bVal = b[sortColumn as keyof Job]
+    const aVal = a[sortColumn as keyof Job];
+    const bVal = b[sortColumn as keyof Job];
 
-    if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1
-    if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1
-    return 0
-  })
+    if (aVal < bVal) return sortDirection === "asc" ? -1 : 1;
+    if (aVal > bVal) return sortDirection === "asc" ? 1 : -1;
+    return 0;
+  });
 
   const deleteJob = (id: number) => {
-    const token = localStorage.getItem("token")
-    fetch(`http://localhost:8000/jobs/${id}`, { method: "DELETE", headers: { "Authorization": `Bearer ${token}` } })
-      .then(() => fetchJobs())
-  }
+    const token = localStorage.getItem("token");
+    fetch(`http://localhost:8000/jobs/${id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${token}` },
+    }).then(() => fetchJobs());
+  };
 
   const updateStatus = (id: number, status: string) => {
-    const token = localStorage.getItem("token")
-    fetch(`http://localhost:8000/jobs/${id}?status=${status}`, { method: "PATCH", headers: { "Authorization": `Bearer ${token}` } })
-      .then(() => fetchJobs())
-  }
+    const token = localStorage.getItem("token");
+    fetch(`http://localhost:8000/jobs/${id}?status=${status}`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${token}` },
+    }).then(() => fetchJobs());
+  };
 
   useEffect(() => {
-    fetchJobs()
-    const interval = setInterval(fetchJobs, 5000)
-    return () => clearInterval(interval)
-  }, [])
+    fetchJobs();
+    const interval = setInterval(fetchJobs, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <>
       <StatusDial jobs={jobs} />
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '-1rem' }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          marginBottom: "-1rem",
+        }}
+      >
         <input
           type="text"
           className="search-input"
@@ -126,28 +106,34 @@ export function JobListTable() {
         <TableHeader>
           <TableRow>
             <TableHead
-              onClick={() => handleSort('title')}
-              style={{ cursor: 'pointer' }}
+              onClick={() => handleSort("title")}
+              style={{ cursor: "pointer" }}
             >
-              Title {sortColumn === 'title' && (sortDirection === 'asc' ? '↑' : '↓')}
+              Title{" "}
+              {sortColumn === "title" && (sortDirection === "asc" ? "↑" : "↓")}
             </TableHead>
             <TableHead
-              onClick={() => handleSort('company')}
-              style={{ cursor: 'pointer' }}
+              onClick={() => handleSort("company")}
+              style={{ cursor: "pointer" }}
             >
-              Company {sortColumn === 'company' && (sortDirection === 'asc' ? '↑' : '↓')}
+              Company{" "}
+              {sortColumn === "company" &&
+                (sortDirection === "asc" ? "↑" : "↓")}
             </TableHead>
             <TableHead
-              onClick={() => handleSort('location')}
-              style={{ cursor: 'pointer' }}
+              onClick={() => handleSort("location")}
+              style={{ cursor: "pointer" }}
             >
-              Location {sortColumn === 'location' && (sortDirection === 'asc' ? '↑' : '↓')}
+              Location{" "}
+              {sortColumn === "location" &&
+                (sortDirection === "asc" ? "↑" : "↓")}
             </TableHead>
             <TableHead
-              onClick={() => handleSort('status')}
-              style={{ cursor: 'pointer' }}
+              onClick={() => handleSort("status")}
+              style={{ cursor: "pointer" }}
             >
-              Status {sortColumn === 'status' && (sortDirection === 'asc' ? '↑' : '↓')}
+              Status{" "}
+              {sortColumn === "status" && (sortDirection === "asc" ? "↑" : "↓")}
             </TableHead>
             <TableHead></TableHead>
             <TableHead></TableHead>
@@ -158,12 +144,18 @@ export function JobListTable() {
             <TableRow key={job.id}>
               <TableCell>{job.title}</TableCell>
               <TableCell>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "2rem" }}
+                >
                   <img
                     src={`../logos/${mapCompanyLogo(job.company)}.png`}
                     alt=""
-                    style={{ width: '32px', height: '32px', borderRadius: '4px' }}
-                    onError={(e) => e.currentTarget.style.display = 'none'}
+                    style={{
+                      width: "32px",
+                      height: "32px",
+                      borderRadius: "4px",
+                    }}
+                    onError={(e) => (e.currentTarget.style.display = "none")}
                   />
                   {job.company}
                 </div>
@@ -198,8 +190,7 @@ export function JobListTable() {
             </TableRow>
           ))}
         </TableBody>
-      </Table >
+      </Table>
     </>
-  )
+  );
 }
-

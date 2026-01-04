@@ -1,10 +1,11 @@
-import type { Job } from "../types.ts"
+import type { Job } from "../types.ts";
+import type { JSX } from "react";
 
 interface StatusDialProps {
-  jobs: Job[]
+  jobs: Job[];
 }
 
-const STATUS_ORDER = ["Logged", "Applied", "Interview", "Rejected", "Offer"]
+const STATUS_ORDER = ["Logged", "Applied", "Interview", "Rejected", "Offer"];
 
 const STATUS_COLORS: Record<string, string> = {
   Logged: "#E8E4DE",
@@ -12,75 +13,79 @@ const STATUS_COLORS: Record<string, string> = {
   Interview: "#E8DCF0",
   Rejected: "#F0E0DC",
   Offer: "#DCF0E0",
-}
+};
 
 export function StatusDial({ jobs }: StatusDialProps) {
-  const total = jobs.length
-  const loggedCount = jobs.filter(j => j.status === "Logged").length
-  const appliedCount = total - loggedCount
+  const total = jobs.length;
+  const loggedCount = jobs.filter((j) => j.status === "Logged").length;
+  const appliedCount = total - loggedCount;
 
   // Count by status
-  const counts = jobs.reduce((acc, job) => {
-    acc[job.status] = (acc[job.status] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
+  const counts = jobs.reduce(
+    (acc, job) => {
+      acc[job.status] = (acc[job.status] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   // Build segments in fixed order
-  const segments = STATUS_ORDER
-    .filter(status => counts[status] > 0)
-    .map(status => ({
+  const segments = STATUS_ORDER.filter((status) => counts[status] > 0).map(
+    (status) => ({
       status,
       color: STATUS_COLORS[status],
       percentage: counts[status] / total,
-    }))
+    }),
+  );
 
   // Arc settings
-  const radius = 45
-  const strokeWidth = 5
-  const center = 50
-  const gapAngle = 90
-  const totalArcAngle = 360 - gapAngle
-  const startOffset = -225
+  const radius = 45;
+  const strokeWidth = 5;
+  const center = 50;
+  const gapAngle = 90;
+  const totalArcAngle = 360 - gapAngle;
+  const startOffset = -225;
 
-  let currentAngle = startOffset
+  const arcs = segments.reduce<{ angle: number; elements: JSX.Element[] }>(
+    (acc, segment) => {
+      const arcAngle = segment.percentage * totalArcAngle;
+      const startAngle = acc.angle;
+      const endAngle = acc.angle + arcAngle;
 
-  const arcs = segments.map((segment, _) => {
-    const angle = segment.percentage * totalArcAngle
-    const startAngle = currentAngle
-    const endAngle = currentAngle + angle
-    currentAngle = endAngle
+      const startRad = (startAngle * Math.PI) / 180;
+      const endRad = (endAngle * Math.PI) / 180;
 
-    const startRad = (startAngle * Math.PI) / 180
-    const endRad = (endAngle * Math.PI) / 180
+      const x1 = center + radius * Math.cos(startRad);
+      const y1 = center + radius * Math.sin(startRad);
+      const x2 = center + radius * Math.cos(endRad);
+      const y2 = center + radius * Math.sin(endRad);
 
-    const x1 = center + radius * Math.cos(startRad)
-    const y1 = center + radius * Math.sin(startRad)
-    const x2 = center + radius * Math.cos(endRad)
-    const y2 = center + radius * Math.sin(endRad)
+      const largeArc = arcAngle > 180 ? 1 : 0;
+      const d = `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2}`;
 
-    const largeArc = angle > 180 ? 1 : 0
-
-    const d = `M ${x1} ${y1} A ${radius} ${radius} 0 ${largeArc} 1 ${x2} ${y2}`
-
-    return (
-      <path
-        key={segment.status}
-        d={d}
-        fill="none"
-        stroke={segment.color}
-        strokeWidth={strokeWidth}
-      />
-    )
-  })
+      acc.elements.push(
+        <path
+          key={segment.status}
+          d={d}
+          fill="none"
+          stroke={segment.color}
+          strokeWidth={strokeWidth}
+        />,
+      );
+      acc.angle = endAngle;
+      return acc;
+    },
+    { angle: startOffset, elements: [] },
+  ).elements;
 
   // Background arc
-  const bgStartRad = (startOffset * Math.PI) / 180
-  const bgEndRad = ((startOffset + totalArcAngle) * Math.PI) / 180
-  const bgX1 = center + radius * Math.cos(bgStartRad)
-  const bgY1 = center + radius * Math.sin(bgStartRad)
-  const bgX2 = center + radius * Math.cos(bgEndRad)
-  const bgY2 = center + radius * Math.sin(bgEndRad)
-  const bgPath = `M ${bgX1} ${bgY1} A ${radius} ${radius} 0 1 1 ${bgX2} ${bgY2}`
+  const bgStartRad = (startOffset * Math.PI) / 180;
+  const bgEndRad = ((startOffset + totalArcAngle) * Math.PI) / 180;
+  const bgX1 = center + radius * Math.cos(bgStartRad);
+  const bgY1 = center + radius * Math.sin(bgStartRad);
+  const bgX2 = center + radius * Math.cos(bgEndRad);
+  const bgY2 = center + radius * Math.sin(bgEndRad);
+  const bgPath = `M ${bgX1} ${bgY1} A ${radius} ${radius} 0 1 1 ${bgX2} ${bgY2}`;
 
   return (
     <div className="status-dial">
@@ -101,5 +106,5 @@ export function StatusDial({ jobs }: StatusDialProps) {
       </div>
       <div className="status-dial-logged">{total} Logged</div>
     </div>
-  )
+  );
 }

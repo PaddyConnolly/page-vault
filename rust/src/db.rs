@@ -7,7 +7,7 @@ fn db_path() -> Result<PathBuf, Error> {
         Some(dir) => Ok(dir.join("page-vault/page-vault.db")),
         None => {
             eprintln!("Failed to locate data directory");
-            return Err(Error::InvalidPath("Could not find data directory".into()));
+            Err(Error::InvalidPath("Could not find data directory".into()))
         }
     }
 }

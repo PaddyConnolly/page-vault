@@ -1,0 +1,27 @@
+#!/bin/bash
+set -e
+
+echo "Running backend checks..."
+cd backend
+uv run ruff check src/
+uv run pyright src/
+uv run pytest
+
+echo "Running frontend checks..."
+cd ../frontend
+npm run lint -- --fix
+npx prettier --write src/
+npm run build
+
+echo "Running Rust server checks..."
+cd ../rust
+cargo fmt --check
+cargo clippy -- -D warnings
+cargo test
+
+echo "Running extension checks..."
+cd ../extension
+npm run lint
+npm run build
+
+echo "All checks passed!"

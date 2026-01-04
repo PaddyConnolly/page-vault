@@ -5,19 +5,20 @@ import tldextract
 import sqlite3
 
 
-DBConnection = sqlite3.Connection 
-Page = sqlite3.Row 
+DBConnection = sqlite3.Connection
+Page = sqlite3.Row
 
 
 def get_page_url(page: Page) -> str:
     return str(page["url"])
+
 
 def get_company_name_from_url(url: str) -> str:
     # Hacks for the annoying ones
     extracted = tldextract.extract(url)
     job_boards = ["myworkdayjobs", "eightfold"]
     if extracted.domain in job_boards:
-        subdomain = extracted.subdomain.split('.')[0]
+        subdomain = extracted.subdomain.split(".")[0]
         if subdomain == "aexp":
             domain = "american express"
             return domain.title()
@@ -32,7 +33,7 @@ def get_company_name_from_url(url: str) -> str:
 
 
 def get_company_id_from_url(conn: DBConnection, url: str) -> int | None:
-    name = get_company_name_from_url(url) 
+    name = get_company_name_from_url(url)
     cur = conn.cursor()
     cur.execute("SELECT id FROM company WHERE name = ?", (name,))
     row = cur.fetchone()
@@ -41,6 +42,7 @@ def get_company_id_from_url(conn: DBConnection, url: str) -> int | None:
         return int(row["id"])
     else:
         return None
+
 
 def get_company_id_from_name(conn: DBConnection, name: str) -> int | None:
     cur = conn.cursor()
@@ -51,6 +53,7 @@ def get_company_id_from_name(conn: DBConnection, name: str) -> int | None:
         return int(row["id"])
     else:
         return None
+
 
 def get_job_title(soup: BeautifulSoup, selector: str) -> str | None:
     title = soup.select_one(selector)
@@ -71,15 +74,22 @@ def get_job_content(soup: BeautifulSoup, selector: str) -> str | None:
     if content:
         return content.text
 
-def parse_content(content: str) -> tuple[str,...]:
-    return (str("1"),str("2"),str("3"))
 
-def trigger_company_creation(conn: DBConnection, name: str, selectors: list[str]) -> int:
+def parse_content(content: str) -> tuple[str, ...]:
+    return (str("1"), str("2"), str("3"))
+
+
+def trigger_company_creation(
+    conn: DBConnection, name: str, selectors: list[str]
+) -> int:
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(
+        """
                 INSERT INTO company (name, location_selector, header_selector, content_selector)
                 VALUES (?, ?, ?, ?);
-                """, (name, *selectors))
+                """,
+        (name, *selectors),
+    )
     conn.commit()
     if cur.lastrowid:
         return cur.lastrowid
@@ -89,16 +99,29 @@ def trigger_company_creation(conn: DBConnection, name: str, selectors: list[str]
 
 def insert_job(conn: DBConnection, job: ParsedJob, user_id: int):
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(
+        """
     INSERT INTO job (page_id, company_id, user_id, title, location, url, descr, reqs, preferred_reqs)
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
     """,
-    (job.page_id, job.company_id, user_id, job.title, job.location, job.url, job.descr, job.reqs, job.preferred_reqs))
+        (
+            job.page_id,
+            job.company_id,
+            user_id,
+            job.title,
+            job.location,
+            job.url,
+            job.descr,
+            job.reqs,
+            job.preferred_reqs,
+        ),
+    )
     conn.commit()
     if cur.lastrowid:
         return cur.lastrowid
     else:
         raise Exception("Couldn't insert new job")
+
 
 def insert_parsed(conn: DBConnection, html: str) -> int:
     cur = conn.cursor()
@@ -109,39 +132,60 @@ def insert_parsed(conn: DBConnection, html: str) -> int:
     else:
         raise Exception("Couldn't insert new parse")
 
+
 def get_selectors_from_html(html: Page) -> list[str]:
-    return ["ul.association-content li",".title","div.container > div > div > div.content"] 
+    return [
+        "ul.association-content li",
+        ".title",
+        "div.container > div > div > div.content",
+    ]
+
 
 def get_selectors_from_db(conn: DBConnection, company_id: int) -> list[str]:
     cur = conn.cursor()
-    cur.execute("SELECT header_selector, location_selector, content_selector FROM company WHERE id = ?", (company_id,))
+    cur.execute(
+        "SELECT header_selector, location_selector, content_selector FROM company WHERE id = ?",
+        (company_id,),
+    )
     row = cur.fetchone()
     return [row["header_selector"], row["location_selector"], row["content_selector"]]
 
+
 def normalize_location(location: str) -> str:
     cities = [
-        "London", "Dublin", "San Jose", "Tokyo", "Stockholm", 
-        "Amsterdam", "Berlin", "Paris", "New York", "San Francisco",
-        "Singapore", "Sydney", "Toronto", "Remote"
+        "London",
+        "Dublin",
+        "San Jose",
+        "Tokyo",
+        "Stockholm",
+        "Amsterdam",
+        "Berlin",
+        "Paris",
+        "New York",
+        "San Francisco",
+        "Singapore",
+        "Sydney",
+        "Toronto",
+        "Remote",
     ]
-    
+
     location_upper = location.upper()
     for city in cities:
         if city.upper() in location_upper:
             return city
-    
+
     # Fallback: return original, cleaned up
     return location.strip()
+
 
 def parse_page(page: Page, user_id: int):
     conn = get_db()
     if page:
-        soup = BeautifulSoup(page["html"], 'html.parser')
+        soup = BeautifulSoup(page["html"], "html.parser")
         url = get_page_url(page)
 
     else:
         raise Exception("Failed to get Page")
-
 
     company_id = get_company_id_from_url(conn, url)
 
@@ -157,10 +201,11 @@ def parse_page(page: Page, user_id: int):
 
         else:
             raise Exception("Bad request 1")
-    
 
     else:
-        title_selector, location_selector, content_selector = get_selectors_from_db(conn, company_id)
+        title_selector, location_selector, content_selector = get_selectors_from_db(
+            conn, company_id
+        )
         title = get_job_title(soup, title_selector)
         location = get_job_location(soup, location_selector)
         content = get_job_content(soup, content_selector)
@@ -169,21 +214,27 @@ def parse_page(page: Page, user_id: int):
 
         else:
             raise Exception("Bad request 2")
-    
 
-    if (title is not None and
-        location is not None):
+    if title is not None and location is not None:
         page_id = insert_parsed(conn, str(page["html"]))
-        job = ParsedJob(page_id=page_id, company_id=company_id, title=title, location=location, url=url, descr=descr, reqs=reqs, preferred_reqs=preferred_reqs)
+        job = ParsedJob(
+            page_id=page_id,
+            company_id=company_id,
+            title=title,
+            location=location,
+            url=url,
+            descr=descr,
+            reqs=reqs,
+            preferred_reqs=preferred_reqs,
+        )
         insert_job(conn, job, user_id)
     else:
         raise Exception("Bad Request")
 
-
     conn.close()
 
-def parse_pages(conn: DBConnection, user_id: int):
 
+def parse_pages(conn: DBConnection, user_id: int):
     pages = get_pages(conn)
     if pages:
         for page in pages:

@@ -2,11 +2,11 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from pathlib import Path
 from src.models import JobDisplay
-from appdirs import user_data_dir
+from platformdirs import user_data_dir
 
 import sqlite3
 
-DBConnection = sqlite3.Connection 
+DBConnection = sqlite3.Connection
 Page = sqlite3.Row
 
 
@@ -20,7 +20,8 @@ def get_db():
     conn.execute("PRAGMA foreign_keys = ON;")
     conn.execute("PRAGMA journal_mode = WAL;")
     conn.execute("PRAGMA busy_timeout = 5000;")
-    return conn 
+    return conn
+
 
 def get_db_dep():
     conn = get_db()
@@ -28,6 +29,7 @@ def get_db_dep():
         yield conn
     finally:
         conn.close()
+
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -76,7 +78,6 @@ async def lifespan(_: FastAPI):
                 created TEXT DEFAULT CURRENT_TIMESTAMP)
                 """)
 
-
     conn.commit()
     conn.close()
     yield
@@ -91,13 +92,17 @@ def get_pages(conn: DBConnection) -> list[Page] | None:
 
 def get_jobs_for_display(conn: DBConnection, user_id: int) -> list[JobDisplay]:
     cur = conn.cursor()
-    cur.execute("""
+    cur.execute(
+        """
         SELECT job.id, job.title, company.name as company, job.location, job.url, job.status
         FROM job JOIN company ON job.company_id = company.id WHERE job.user_id = ?;
-                """, (user_id,))
+                """,
+        (user_id,),
+    )
     rows = cur.fetchall()
     jobs = [JobDisplay(**dict(row)) for row in rows]
     return jobs
+
 
 def get_company_name(conn: DBConnection, id: int) -> str:
     cur = conn.cursor()

@@ -4,10 +4,10 @@
 
 @layer base {
   :root {
-    --background: #F5F1EB;
-    --foreground: #3D3530;
-    --primary: #8B7355;
-    --border: #D9D0C4;
+    --background: #f5f1eb;
+    --foreground: #3d3530;
+    --primary: #8b7355;
+    --border: #d9d0c4;
     --radius: 0.25rem;
   }
 
@@ -49,7 +49,7 @@
 }
 
 .table tr:hover {
-  background-color: #EDE8E0;
+  background-color: #ede8e0;
 }
 
 .table a {
@@ -89,8 +89,8 @@ table a.link-button {
 }
 
 .delete-button:hover {
-  background: #E8D0D0;
-  color: #8B5555;
+  background: #e8d0d0;
+  color: #8b5555;
 }
 
 .status-select {
@@ -107,11 +107,26 @@ table a.link-button {
   opacity: 0.8;
 }
 
-.status-logged { background: #E8E4DE; color: #6B6560; }
-.status-applied { background: #DDE8F0; color: #4A6785; }
-.status-interview { background: #E8DCF0; color: #6B5085; }
-.status-rejected { background: #F0E0DC; color: #8B5A50; }
-.status-offer { background: #DCF0E0; color: #4A7550; }
+.status-logged {
+  background: #e8e4de;
+  color: #6b6560;
+}
+.status-applied {
+  background: #dde8f0;
+  color: #4a6785;
+}
+.status-interview {
+  background: #e8dcf0;
+  color: #6b5085;
+}
+.status-rejected {
+  background: #f0e0dc;
+  color: #8b5a50;
+}
+.status-offer {
+  background: #dcf0e0;
+  color: #4a7550;
+}
 
 .status-dial {
   position: relative;
@@ -237,7 +252,7 @@ table a.link-button {
 }
 
 .company-card:hover {
-  background-color: #EDE8E0;
+  background-color: #ede8e0;
 }
 
 .company-logo {
@@ -303,7 +318,7 @@ table a.link-button {
 }
 
 .auth-error {
-  color: #8B5555;
+  color: #8b5555;
   font-size: 0.9rem;
   margin: 0;
 }
@@ -323,7 +338,6 @@ table a.link-button {
 .auth-link:hover {
   text-decoration: underline;
 }
-
 
 .logout-button {
   background: none;

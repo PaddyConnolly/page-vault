@@ -1,28 +1,38 @@
-import { Routes, Route, Link } from 'react-router-dom'
-import { JobListTable } from './components/JobListTable'
-import { Companies } from './components/Companies.tsx'
-import { Auth } from './components/Auth.tsx'
-import { useState } from 'react'
+import { Routes, Route, Link } from "react-router-dom";
+import { JobListTable } from "./components/JobListTable";
+import { Companies } from "./components/Companies.tsx";
+import { Auth } from "./components/Auth.tsx";
+import { useState } from "react";
 
 function App() {
-  const [token, setToken] = useState<string | null>(localStorage.getItem("token"))
+  const [token, setToken] = useState<string | null>(
+    localStorage.getItem("token"),
+  );
 
   const logout = () => {
-    localStorage.removeItem("token")
-    setToken(null)
-  }
+    localStorage.removeItem("token");
+    setToken(null);
+  };
 
   if (!token) {
-    return <Auth onLogin={setToken} />
+    return <Auth onLogin={setToken} />;
   }
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 1.5rem' }}>
+    <div
+      style={{ maxWidth: "1200px", margin: "0 auto", padding: "3rem 1.5rem" }}
+    >
       <nav className="navbar">
         <h1 className="nav-title">Page Vault</h1>
         <div className="nav-links">
-          <Link to="/" className="nav-link">Jobs</Link>
-          <Link to="/companies" className="nav-link">Companies</Link>
-          <button onClick={logout} className="logout-button">Logout</button>
+          <Link to="/" className="nav-link">
+            Jobs
+          </Link>
+          <Link to="/companies" className="nav-link">
+            Companies
+          </Link>
+          <button onClick={logout} className="logout-button">
+            Logout
+          </button>
         </div>
       </nav>
       <Routes>
@@ -30,6 +40,6 @@ function App() {
         <Route path="/companies" element={<Companies />} />
       </Routes>
     </div>
-  )
+  );
 }
-export default App
+export default App;

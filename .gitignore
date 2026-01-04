@@ -16,3 +16,4 @@ extension/node_modules/
 extension/dist/
 *.log
 .DS_STORE
+*.d.ts

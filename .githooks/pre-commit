@@ -1,0 +1,26 @@
+#!/bin/bash
+set -e
+
+echo "Backend lint + format..."
+cd backend
+uv run ruff check src/ --fix
+uv run ruff format src/
+
+echo "Frontend lint + format..."
+cd ../frontend
+npm run lint -- --fix
+npx prettier --write src/
+
+echo "Rust fmt..."
+cd ../rust
+cargo fmt
+
+echo "Extension lint + format..."
+cd ../extension
+npm run lint -- --fix
+npx prettier --write src/
+
+# Stage any reformatted files
+git add -u
+
+echo "All checks passed!"

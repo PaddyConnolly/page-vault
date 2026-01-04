@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from datetime import datetime
 
+
 @dataclass
 class ParsedJob:
     page_id: int
@@ -26,6 +27,7 @@ class Job:
     reqs: str
     preferred_reqs: str
     created: datetime
+
 
 @dataclass
 class JobDisplay:

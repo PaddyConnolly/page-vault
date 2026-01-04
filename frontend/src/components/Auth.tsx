@@ -1,48 +1,48 @@
-import { useState } from 'react'
+import { useState } from "react";
 
 interface AuthProps {
-  onLogin: (token: string) => void
+  onLogin: (token: string) => void;
 }
 
 export function Auth({ onLogin }: AuthProps) {
-  const [isLogin, setIsLogin] = useState(true)
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
+    e.preventDefault();
+    setError("");
 
-    const endpoint = isLogin ? "/login" : "/register"
+    const endpoint = isLogin ? "/login" : "/register";
 
     try {
       const response = await fetch(`http://localhost:8000${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password })
-      })
+        body: JSON.stringify({ email, password }),
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        setError(data.detail || "Something went wrong")
-        return
+        setError(data.detail || "Something went wrong");
+        return;
       }
 
       if (isLogin) {
-        localStorage.setItem("token", data.token)
-        onLogin(data.token)
+        localStorage.setItem("token", data.token);
+        onLogin(data.token);
       } else {
         // After register, switch to login
-        setIsLogin(true)
-        setEmail("")
-        setPassword("")
+        setIsLogin(true);
+        setEmail("");
+        setPassword("");
       }
-    } catch (e) {
-      setError("Network error")
+    } catch {
+      setError("Network error");
     }
-  }
+  };
 
   return (
     <div className="auth-container">
@@ -76,5 +76,5 @@ export function Auth({ onLogin }: AuthProps) {
         </span>
       </p>
     </div>
-  )
+  );
 }

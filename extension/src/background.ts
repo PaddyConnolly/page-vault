@@ -1,4 +1,4 @@
-declare const browser: any;
+declare const browser: typeof import("webextension-polyfill");
 
 interface PageData {
   url: string;
@@ -20,9 +20,8 @@ async function captureCurrentPage(): Promise<PageData | null> {
 
   const results = await browser.scripting.executeScript({
     target: { tabId: tab.id },
-    func: () => document.documentElement.outerHTML
+    func: () => document.documentElement.outerHTML,
   });
-
 
   const html: string = results[0].result as string;
 
@@ -31,12 +30,12 @@ async function captureCurrentPage(): Promise<PageData | null> {
 
 async function sendToServer(data: PageData): Promise<boolean> {
   try {
-    const response = await fetch('http://127.0.0.1:8080/save', {
-      method: 'POST',
+    const response = await fetch("http://127.0.0.1:8080/save", {
+      method: "POST",
       headers: {
-        'page-url': data.url
+        "page-url": data.url,
       },
-      body: data.html
+      body: data.html,
     });
 
     return response.ok;

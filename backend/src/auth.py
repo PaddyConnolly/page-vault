@@ -8,6 +8,7 @@ import bcrypt
 import os
 from dotenv import load_dotenv
 
+
 class AuthRequest(BaseModel):
     email: str
     password: str
@@ -16,6 +17,7 @@ class AuthRequest(BaseModel):
 auth_router = APIRouter()
 load_dotenv()
 
+
 def create_token(user_id: int) -> bytes:
     now = datetime.now(timezone.utc)
     payload = {
@@ -23,10 +25,10 @@ def create_token(user_id: int) -> bytes:
         "iss": "page-vault",
         "aud": "page-vault-api",
         "iat": now,
-        "exp": now + timedelta(days=7)
+        "exp": now + timedelta(days=7),
     }
     secret = os.environ.get("JWT_SECRET", "dev-fallback-secret")
-    token =  jwt.encode(payload, secret, algorithm="HS256")
+    token = jwt.encode(payload, secret, algorithm="HS256")
     return token
 
 
@@ -36,12 +38,15 @@ def get_current_user(authorization: str = Header(..., alias="Authorization")) ->
     payload = jwt.decode(token, key, algorithms=["HS256"], audience="page-vault-api")
     return int(payload["sub"])
 
+
 @auth_router.post("/register")
 def register_user(req: AuthRequest, conn: DBConnection = Depends(get_db_dep)):
     hash = bcrypt.hashpw(req.password.encode("utf-8"), bcrypt.gensalt(rounds=12))
     cur = conn.cursor()
     try:
-        cur.execute("INSERT INTO user (email, password_hash) VALUES (?, ?)", (req.email, hash))
+        cur.execute(
+            "INSERT INTO user (email, password_hash) VALUES (?, ?)", (req.email, hash)
+        )
         conn.commit()
         return {"message": "User created"}
     except sqlite3.IntegrityError:
@@ -61,5 +66,3 @@ def login_user(req: AuthRequest, conn: DBConnection = Depends(get_db_dep)):
             raise HTTPException(status_code=401, detail="Invalid username or password")
     else:
         raise HTTPException(status_code=401, detail="Invalid username or password")
-
-

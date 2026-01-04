@@ -1,10 +1,15 @@
-export type Status = "Logged" | "Applied" | "Interviewing" | "Rejected" | "Accepted"
+export type Status =
+  | "Logged"
+  | "Applied"
+  | "Interviewing"
+  | "Rejected"
+  | "Accepted";
 
 interface StatusBadgeProps {
-  status: Status
+  status: Status;
 }
 
 export function StatusBadge({ status }: StatusBadgeProps) {
-  const className = `status-badge status-${status.toLowerCase()}`
-  return <span className={className}>{status}</span>
+  const className = `status-badge status-${status.toLowerCase()}`;
+  return <span className={className}>{status}</span>;
 }

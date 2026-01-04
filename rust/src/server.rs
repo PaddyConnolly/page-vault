@@ -12,17 +12,17 @@ pub struct HttpRequest {
 
 #[derive(Debug)]
 pub enum Method {
-    GET,
-    POST,
-    OPTIONS,
+    Get,
+    Post,
+    Options,
 }
 
 impl Method {
     fn as_str(&self) -> &'static str {
         match self {
-            Method::GET => "GET",
-            Method::POST => "POST",
-            Method::OPTIONS => "OPTIONS",
+            Method::Get => "GET",
+            Method::Post => "POST",
+            Method::Options => "OPTIONS",
         }
     }
 }
@@ -105,15 +105,15 @@ pub fn handle_connection(stream: TcpStream) -> Result<()> {
             if let (Some(first), Some(second)) = parse_request_line(&line) {
                 match first {
                     "POST" => {
-                        method = Some(Method::POST);
+                        method = Some(Method::Post);
                         path = Some(String::from(second));
                     }
                     "GET" => {
-                        method = Some(Method::GET);
+                        method = Some(Method::Get);
                         path = Some(String::from(second));
                     }
                     "OPTIONS" => {
-                        method = Some(Method::OPTIONS);
+                        method = Some(Method::Options);
                         path = Some(String::from(second));
                     }
                     _ => {}

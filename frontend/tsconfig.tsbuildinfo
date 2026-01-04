@@ -1,0 +1,1 @@
+{"root":["./vite.config.ts","./src/App.tsx","./src/companyLogos.ts","./src/main.tsx","./src/types.ts","./src/components/Auth.tsx","./src/components/Companies.tsx","./src/components/JobListTable.tsx","./src/components/StatusBadge.tsx","./src/components/StatusDial.tsx","./src/components/ui/table.tsx","./src/lib/utils.ts"],"errors":true,"version":"5.9.3"}
