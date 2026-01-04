@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from src.db import get_db_dep, get_jobs_for_display, delete_pages, JobDisplay, DBConnection
 from src.parsing import parse_pages
 from src.auth import get_current_user
+import httpx
 
 
 router = APIRouter()
@@ -14,6 +15,7 @@ def get_jobs(
 ) -> list[JobDisplay]:
     parse_pages(conn, user_id)
     delete_pages(conn)
+    cleanup_dead_jobs(conn, user_id)
 
     return get_jobs_for_display(conn, user_id)
 
@@ -64,3 +66,26 @@ def get_company_categories(conn: DBConnection = Depends(get_db_dep)):
     else:
         return rows
 
+def cleanup_dead_jobs(
+    conn: DBConnection = Depends(get_db_dep),
+    user_id: int = Depends(get_current_user)
+):
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT id, url FROM job 
+        WHERE user_id = ? AND status IN ('Logged', 'Rejected')
+    """, (user_id,))
+    rows = cur.fetchall()
+ 
+    deleted = 0
+    for row in rows:
+        try:
+            resp = httpx.head(row["url"], timeout=5, follow_redirects=True)
+            if resp.status_code == 404:
+                cur.execute("DELETE FROM job WHERE id = ?", (row["id"],))
+                deleted += 1
+        except:
+            pass
+ 
+    conn.commit()
+    return {"checked": len(rows), "deleted": deleted}
