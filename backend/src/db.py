@@ -65,6 +65,7 @@ async def lifespan(_: FastAPI):
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 page_id INTEGER NOT NULL REFERENCES parsed(id),
                 company_id INTEGER NOT NULL REFERENCES company(id),
+                user_id INTEGER NOT NULL REFERENCES user(id),
                 title TEXT NOT NULL,
                 location TEXT NOT NULL,
                 url TEXT NOT NULL UNIQUE,
@@ -88,12 +89,12 @@ def get_pages(conn: DBConnection) -> list[Page] | None:
     return pages
 
 
-def get_jobs_for_display(conn: DBConnection) -> list[JobDisplay]:
+def get_jobs_for_display(conn: DBConnection, user_id: int) -> list[JobDisplay]:
     cur = conn.cursor()
     cur.execute("""
         SELECT job.id, job.title, company.name as company, job.location, job.url, job.status
-        FROM job JOIN company ON job.company_id = company.id;
-                """)
+        FROM job JOIN company ON job.company_id = company.id WHERE job.user_id = ?;
+                """, (user_id,))
     rows = cur.fetchall()
     jobs = [JobDisplay(**dict(row)) for row in rows]
     return jobs

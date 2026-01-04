@@ -14,6 +14,14 @@ A job application tracker with browser-based page capture.
 
 - 🔐 JWT-based authentication implemented from first principles
 
+## Usage
+
+Access site at http://localhost:5173 after
+
+```
+make all
+```
+
 ## Notes
 
 Company detection and location parsing are currently hardcoded:

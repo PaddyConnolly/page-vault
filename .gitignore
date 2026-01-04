@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 # Python/React
 .venv
 __pycache__/
@@ -7,18 +5,15 @@ frontend/node_modules/
 frontend/dist/
 .env
 .env.local
-Makefile
 tmp*
 
 # Rust
-/target
-*.db
+rust/target
+rust/*.db
 
 # TypeScript
-=======
->>>>>>> extension/main
-node_modules/
-dist/
+extension/node_modules/
+extension/dist/
 *.log
 .DS_STORE
-web-ext-artifacts/
+extension/web-ext-artifacts/

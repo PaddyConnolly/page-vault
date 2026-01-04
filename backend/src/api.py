@@ -1,19 +1,21 @@
 from fastapi import APIRouter, Depends, HTTPException
 from src.db import get_db_dep, get_jobs_for_display, delete_pages, JobDisplay, DBConnection
 from src.parsing import parse_pages
+import os
+import jwt
 
 
 router = APIRouter()
 
-@router.get("/jobs")
-def get_jobs(conn: DBConnection = Depends(get_db_dep)) -> list[JobDisplay]:
-    return get_jobs_for_display(conn)
+def get_jobs(
+    conn: DBConnection = Depends(get_db_dep),
+    user_id: int = -1) -> list[JobDisplay]:
+    return get_jobs_for_display(conn, user_id)
 
 @router.post("/parse")
 def parse(conn: DBConnection = Depends(get_db_dep)):
     parse_pages(conn)
     delete_pages(conn)
-    get_jobs(conn)
 
 @router.delete("/jobs/{job_id}")
 def delete_job(job_id: int, conn: DBConnection = Depends(get_db_dep)):
@@ -55,3 +57,9 @@ def get_company_categories(conn: DBConnection = Depends(get_db_dep)):
         raise HTTPException(status_code=404, detail="No categories found")
     else:
         return rows
+
+def get_current_user(authorization: str) -> int:
+    token = authorization.replace("Bearer ", "")
+    key = os.environ.get("JWT_SECRET", "")
+    payload = jwt.decode(token, key, algorithms=["HS256"], audience="page-vault-api")
+    return int(payload["sub"])

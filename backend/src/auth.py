@@ -16,7 +16,7 @@ class AuthRequest(BaseModel):
 auth_router = APIRouter()
 load_dotenv()
 
-def create_token(user_id: int) -> str:
+def create_token(user_id: int) -> bytes:
     now = datetime.now(timezone.utc)
     payload = {
         "sub": str(user_id),
@@ -26,8 +26,9 @@ def create_token(user_id: int) -> str:
         "exp": now + timedelta(hours=1)
     }
     secret = os.environ.get("JWT_SECRET", "dev-fallback-secret")
-    token: str =  jwt.encode(payload, secret, algorithm="HS256") # pyright: ignore[reportUnknownMemberType]
+    token =  jwt.encode(payload, secret, algorithm="HS256")
     return token
+
 
 
 @auth_router.post("/register")
