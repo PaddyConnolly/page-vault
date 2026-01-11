@@ -16,9 +16,9 @@ A job application tracker with browser-based page capture.
 
 ## Usage
 
-Download [extension](extension/page-vault.xpi) and go to Firefox -> Extensions -> Manage Extension -> Install Add-on from file
+Download the [extension](extension/page-vault.xpi) and go to Firefox -> Extensions -> Manage Extension -> Install Add-on from file
 
-Access site at http://localhost:5173 after:
+Access the site at http://localhost:5173 after:
 
 ```
 make all
@@ -33,7 +33,3 @@ Company detection and location parsing are currently hardcoded:
 - Locations are normalized by matching against a list of known cities
 
 See [SUPPORTED_COMPANIES.md](SUPPORTED_COMPANIES.md) for the full list of configured companies (over 35+ tech companies currently configured).
-
-## Status
-
-🚧 Under construction 🚧
